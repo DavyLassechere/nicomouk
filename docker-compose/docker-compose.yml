@@ -1,0 +1,36 @@
+#tag: 00_00_00 date:07/04/2020
+version: '2'
+
+services:
+
+  nicomouk_db:
+    image: mysql:5.7.21
+    container_name: nicomouk_db
+    restart: always
+    environment:
+    - MYSQL_ROOT_PASSWORD=${MYSQL_PASSWORD}
+    - MYSQL_DATABASE=${MYSQL_DATABASE}
+    - MYSQL_USER=${MYSQL_USER}
+    - MYSQL_PASSWORD=${MYSQL_PASSWORD}
+    volumes:
+    - "/apps/nicomoukbookstackmysql/volumes/mysql:/var/lib/mysql"
+
+  nicomouk_web:
+    image: solidnerd/bookstack:0.27.5
+    container_name: nicomouk_web
+    restart: always
+    depends_on:
+    - nicomouk_db
+    environment:
+    - DB_HOST=nicomouk_db:3306
+    - DB_DATABASE=${MYSQL_DATABASE}
+    - DB_USERNAME=${MYSQL_USER}
+    - DB_PASSWORD=${MYSQL_PASSWORD}
+    - APP_URL="https://nicomouk.ilteam.fr"
+    - STORAGE_TYPE=local_secure
+    - APP_LANG=fr
+    volumes:
+    - "/apps/nicomoukbookstackmysql/volumes/bookstack/uploads:/var/www/bookstack/public/uploads/"
+    - "/apps/nicomoukbookstackmysql/volumes/bookstack/storage-uploads:/var/www/bookstack/storage/uploads"
+    ports:
+    - "6803:80"
